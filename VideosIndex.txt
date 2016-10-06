@@ -1,0 +1,61 @@
+
+Udacity Videos
+---------------
+
+P1 - predicting boston house prices videos
+boston-housing.zip
+
+
+# Supervised Learning - 17 lessons - 1 project
+0 - Supervised Learning Intro
+1 - Regression & Classification
+2 - Regressions
+3 - More Regressions
+4 - Decision Trees
+ID3 algorithm for decision trees.pdf
+5 - More Decision Trees
+6 - Neural Network Videos
+Neural Networks.pdf
+Gradient Descent.pdf
+<< neural networks mini project >> (online)
+Kernel Methods and SVMs pdf
+7 - Kernel Methods and SVMs
+8 - SVM Videos
+# Non-Parametric Methods
+Instance Based Learning.pdf
+9 - Instance Based Learning Videos
+# Bayesian Methods
+10 Naive Bayes Videos
+Bayesian Learning.pdf
+11- Bayesian Learning Videos
+Bayesian Inference.pdf
+12 - Bayesian Inferencee Videos
+<< Bayes NLP mini project>> (online)
+# Ensemble of learners
+Intro to boosting.pdf
+13 - Ensemble B&B videos
+# project 2 P2 building an intervention system.zip (project)
+student intervention
+
+# Career Development Resume Review
+(35 sections)
+
+# Career Develpment - Cover letter review
+
+# ML Interview Practice
+
+
+# Unsupervised Learning
+0 - Introduction to unsupervised learning
+1 - Clustering
+2 - More Clustering
+3 - Clustering Mini Project
+<<quizes online>>
+4 - feature scaling
+5 - feature selection
+6 - PCA
+7 - PCA Mini Project
+<< mini project online >>
+8 - feature transformation
+outro
+<< project P3 creating customer segments >>

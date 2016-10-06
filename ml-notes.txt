@@ -1,0 +1,328 @@
+Machine learning engineer nanodegree
+--------------------------------------
+Machine learning: 
+	"learning concepts from raw data"
+
+Supervised learning: 
+	"function approximation"
+
+Inference: 3 forms:
+
+Deduction: using rules and logic to deduce what will happen. e.g. given A implies B, and given A true, then can deduce that B true. 
+	given the rule and the cause, deduce the effect
+	deduction is truth preserving.
+Induction: generalisation, going from examples to rule, specifics to generality. can be seen as function approximation
+	given a cause and an effect, induce a rule
+	induction not truth preserving, not always correct
+Abduction: diagnosis, is an instance of abduction
+	givena rule and an effect, abduce a cause
+	abduction not truth preserving, not always correct. can be multiple causes for an effect.
+
+
+Unsupervised Learning:
+	unlabelled.
+	"description" "summarization"
+
+Reinforcement Learning:
+	learning from delayed reward
+
+>>>>Udacity: "Machine Learning for Trading" course, Tucker Balch.
+
+Taxonomy:
+	what learnt: parameters, structure, hidden concepts
+	what from: supervised: target labels, unsupervised, reinforcement: reward
+	what: prediction, diagnostics, summarization
+	how? passive, active, online, offline
+	outputs: classification (discrete), regression (continuous)
+	details: generative (model the data as generally as possible), discriminate (seeks to distinguish the data)
+
+
+Supervised Learning:
+	X1,X2,X3,... -> Y
+	feature vector -> label, predictor? 
+	goal is to identify/ approximate function f, where f(Xm) = Ym
+
+Occam's Razor - everything else being equal, choose less complex hypothesis.
+	- in practise, there is a trade-off between complexity and fit
+	- want minimal generalisation error: = sum of training data error and overfitting error.
+
+Spam detection: classify spam or ham.
+	"Bag of words" representation. just counts of each word in dictionary. ignores order.
+
+
+Classification - discrete Y
+Regression - continuous Y = f(X)
+
+Linear Regression:
+	f(x) = W.X + W0, or in 1d:  y = w1x + w0
+	loss = sum_j( yj - w1.xj - w0)^2
+	solution = argmin(all w){loss}
+
+
+
+Parametric versus non-parametric (instance based) methods
+- parametric good if general form of the relationship between inputs and outputs are known.
+- if totally unknown then non-parametric may be best
+- parametric: 
+	- space efficient, no need to store training data
+	- more involved to update the model
+	- training slow
+	- querying fast
+- instance-based/non-parametric
+	- hard to apply to large datasets.
+	- don't need a model.
+	- training fast
+	- querying can be slow
+
+
+Decision Tree
+--------------
+XOR problem is exponential
+OR is linear in n
+decision trees, very expressive. for n boolean attributes, there are 2^(2^n) possible trees
+
+ID3 algorithm:
+Gain(S,A) = Entropy(S) - Sum_v ( |S_v| * Entropy(S_v) / |S| )
+where:
+	Entropy() = - Sum_v ( p(v) log p(v)  )
+
+chooses nodes, so that splitting on it has the greatest reduction in entropy (randomness)
+
+ID3 bias:
+	Inductive bias: 
+	 2 parts to this:
+	- restricion bias = H (hypothesis set. set of all possible trees. i.e must be a tree)
+	- preference bias - h from H, which hypothesese we prefer.
+	So concretely:
+		- prefers trees which has good splits near the top
+		- correct over incorrect
+		- prefers shorter trees over longer trees.
+
+Continuous attributes:
+	- could have a node that represents a range. e.g.: ( 20 <= Age < 30 ), which has a True/False result.
+How to deal with overfitting? ID3 algorithm builds tree until all training examples are correctly classified. This can lead to overfitting.
+Pruning - is an approach to avoiding overfitting. Leaf nodes are pruned back, to give best validation set performance.
+	- output could be average of the leaf nodes.
+
+Other params to adjust test set accuracy:
+- min samples split 
+
+>> look at min_sample_split code and quiz.
+
+Entropy: 
+- a measure of *impurity* in the example data:
+- all examples of same class: - entropy = 0 (min value)
+- examples evenly split: entropy = 1 (max value)
+- $ Entropy =  Sum_i { - p_i log_2( p_i )} $  for all classes i.
+
+Information Gain = Entropy(parent) - [weighted average] entropy(children), 
+		where children are those that would result if you were to split the parent.
+
+Decision tree algorithm  - splits on the attribute that maximises the information gain.
+
+Pros-Cons:
+	- easily interpretable results. can graphically interpret the algorithm.
+	- prone to overfitting. Must stop growth of the tree at the appropriate time
+Naive Bayes
+------------
+- make naive assumption of independence between the features.
+Naive Bayes learners and classifiers can be extremely fast compared to more sophisticated methods. 
+The decoupling of the class conditional feature distributions means that each distribution can be independently estimated as a one dimensional distribution. This in turn helps to alleviate problems stemming from the curse of dimensionality.
+On the flip side, although naive Bayes is known as a decent classifier, it is known to be a bad estimator, so the probability outputs from predict_proba are not to be taken too seriously.
+
+Neural Nets
+-----------
+
+Perceptron - linear threshold unit
+	- linear sum of weights, W + threshold, theta
+	- y = Sum(W_i * x_i) - theta. threshold = 0
+	- trick add 1 column to x, then theta becomes just another weight.
+	- perceptron learning rule:
+		d(W_i) = learning_rate * (y_target - y) x_i
+
+Multi-layer Neural networks:
+	  - 1 hidden layer can represent any continuous function
+	  - 2 hidden layers can represent even discontinuous functions.
+
+training by "Error Back-propagation", and gradient descent.
+- stochastic gradient descent useful for larger datasets.	
+
+Weight initialisation:
+	- small - low complexity (occam's razor). better generalisation for simpler nets.
+	- random 
+	values
+
+Stop training when validation set error increases.
+
+Support Vector Machines
+-----------------------
+
+aim to find the maximally separating hyperplane . i.e furthest away from the nearest examples of different classes
+- like instance based methods such as KNN, but, only requires a few instances to be kept. 
+- the algorithm calculates which instances these are.
+
+
+
+- Katie lecture, how is decision boundary computed.
+- SVM - significance of the gamma parameter
+Parameters:
+	 - C controls tradeoff between smoothness of the decision boundary and the accuracy of the classification. - used to control overfitting.
+	 	- C is the penalty factor for the error term. hence high C gives more complex boundary...
+	 - gamma - kernel coefficient, used for rbf, poly, sigmoid kernels. default is 1/n_features.
+
+
+	Pros/Cons
+	- work well in complex domains, where there is a clear margin of separation
+	- dont work well for large datasets - performance is cubic in the size of the dataset.
+	- dont work well for very noisy data (where classes overlap a lot) - naive bayes better here.
+
+	 -- *** TODO: look at Naive Bayes lessons ( intro to AI/machine learning), and get decision boundary code into a Jupyter notebook.
+
+Instance Based methods - KNN
+----------------------------
+
+ - store all training data.
+ - parameterise by k - number of neighbours to consider. plus distance metric.
+ - classification: vote: choose the modal label, from the k nearest neighbours
+ - regression: take the mean Y values from the k nearest neighbours.
+ - tie-breaking. could take min k closest.
+ - lots of options - could weight the votes by 1/distance. or use weighted average for regression.
+ - time & storage cost: O()    training:  cpu:1, storage: n    query: cpu:lg(n) + k,  storage: 1
+    cf. linear regression:     training:  cpu:n, storage: 1    query: cpu: 1          storage: 1
+- important to consider how often we train, versus how often we query. Training just costs storage for knn, but query expensive. For linear regression, training takes longer, but query is fast.
+- knn is a "lazy learner", linear regression is an eager learner.
+
+Preference Bias for KNN:
+	 - ("thing that encompasses a belief about what makes a good hypothesis.")
+	  - locality - near points are similar
+	  - smoothness (we use averaging)
+	  - all features (i.e. dimensions of the input data) matter equally. 
+	  	e.g. imagine the true function we're approximating is Y = x1**2 + x2. then this assumption clearly doesn't hold.
+	  	- cf. curse of dimensionality: as # dimensions, grows, need exponentially more data cover the parameter space at the same resolution.
+	  	Need O(2**d) points
+	  	=> this is a drawback of the KNN method, but also most other methods.
+   
+ Important stuff:
+ - choice of distance function dist(x, q) really matters. lots of choice: e.g. euclidean, manhattan, mismatches
+ 	- Really a "similarity function", doesn't need to be based on any notion of geometrical distance.
+ 	- domain knnowledge important here.
+ - choice of K. 
+ 	- e.g. K=n with weighted average dist function. works for regression.
+ - choice of combinator function to combine Y's of the selected samples
+ 	- typically just average for regression problems, but could do something quite different. e.g perform regression against just the subset of samples.
+ 		 -> "Locally weighted regression". e.g. locally weighted linear regression.
+
+
+Naive Bayes
+------------
+
+P(h|D) = P(D|h). P(h) / P(D)
+
+h_max_a_posteriori = argmax_h: P(h|D)  = P(h|D) = P(D|h). P(h) / P(D)
+simplifies to:
+h_max_likelihood = argmax P(D|h), assuming all h equally likely. (uniform prior over h)
+Note that we dont need to care about P(D), since it doesnt affect the argmax.
+
+
+Bayesian Learning
+------------------
+Can show that, for some data D <x_i, d_i>, sampled from an underlying function f, with noise: e,
+So that:
+	d_i = f(x_i) + e_i
+if we assume a gaussian noise model, then maximum likelihood hypothesis, h_ml
+	h_ml = argmax{h} P(h|D)
+	=> argmin{h} { Sum of Squared error }
+Hence optimising to minimisee MSE gives max likelihood hypothesis, for the data given the hypothesis class. 
+(if noise is uncorrelated, independently drawn, gaussian, with mean zero, and f is a deterministic function)
+Also implicitly assumes that X is noise free, and just D is noisy. which is not typically the case for many data sets.
+
+Information theory:
+- for some event w, with probability p, the optimal code for it has *length* =  -lg p
+(lg = log_base2)
+- length for a hypothesis, can be viewed as the number of bits to represent it. e.g. consider a decision tree. relative size to represent it is clear.
+
+Note: the search for the best hypothesis, is not what we're really after when we're doing classification.
+What we really want is the best label, and that's given by the weighted sum of the label probabilities of *all* hypothesese, weighted by the probability of the hypothesis. i.e.:
+
+	V_MAP = argmax{v} sum{h} { P(v|h) . P(h|D) }
+	This approach of all hypotheses voting, is a Bayes *Optimal* Classifier.
+
+Exact inference is (np?) hard. however Naive Bayes is simpler approximation.
+
+Naive Bayes:
+	MAP class = argmax P(V) product{i} {P(a_i| V)}, where a_i are attributes observed for class V.
+	P(a_i|V) = #(a_i,V)/#V in the data 
+
+Pros:
+	Empirically very sucessful.
+	Inference is cheap. Tractable
+	Handles missing attributes well. (unlike, e.g. decision trees)
+However:
+	- doesn't model interrelationships between the attributes.
+	- probabilities are incorrect if this is not true, but as long as the ordering not affected, then classification unaffected.
+	- since probability is based on product, one unseen attribute, spoils the whole probability.
+		- work around is the regularize/smooth by ensuring that no attribute has no zero probability. (e.g. Laplacian Smoothing - see AI course)
+
+
+Ensemble Learning
+--------------------
+
+Bagging: (Bootstrap Aggregation): sample N random subsets and learn N simple models. Combine by averaging (regression)/voting (classification)
+(very simple approach to ensemble learning)
+
+
+Boosting: choose the "hardest" examples. combine by weighted average.
+- characteristics:
+	- boosting is *really* good
+  - agnostic of the learner
+	- *dont* tend to overfit, in the same way that many other classifiers do.
+		- training further and further tends to increase the confidence of classification, even when error doesn't change.
+		- this increases margin between righly and wrongly classified points.
+		- wide margins tend to act against overfitting
+		- adding the learners ends up with smoother decison boundary, also reducing overfitting.
+	- *could* overfit, if the underlying "weak" learner overfits. 
+		- also overfits pink noise. (uniform noise).
+
+? check this:
+Maximum Likelihood Estimation: generates the choice most likely to have generated the observed data. argmax{h}: P(D|h)
+Maximum A Posteriori: is the choice most likely, given the observed data. argmax{h}: P(h|D)
+
+
+--------------------------
+Bay Area Deep Learning School
+------------------------------
+Videos: 
+
+Cirrascale - rent a box GPU offering
+Adam: learning rate 1e-3,1e-4
+look at latest ILSVRC papers for hyperparams.
+smalll datases => high risk of overfitting. tune dropout rates using crossvalidation to counteract this.
+
+Sparse coding:
+	- unsupervised. 
+	- decompose a sample into linear combination of sparse feature vectors. learn "activations" (coefficients) and "bases" ( vectors)
+	- good at extracting features for classification. 
+	- Efficient algorithm for solving for bases and activations. (alternate solving for each, 1 is lasso problem, 1 is QP problem)
+	- sparse coding is a sparse, over-complete, representation of the input.
+	- encoding is highly non-linear function of the input. reconstruction (decoding) back again is linear function.
+	- naturally gives rise to autoencoders:
+
+Autoencoders:
+- general framework for encoders/decoders
+- encoder: feed-forward, bottom up. generates features.
+- decoder: generative, top down.
+- need to add constraints to avoid learning identity function.
+- if we want to learn binary features, pass encoder through a sigmoid non-linearity.
+- can implement as neural network with 1 hidden layer. 
+- non-linearity in the encoder, not in the decoder. not just sigmoid, could be re-lu, or tanh.
+- typically hidden layer has small dimensionality (bottleneck layer)
+- Note: is encoder is linear, and has shared weights with decoder, then end up with PCA!
+	- the K hidden units, learn the first K principle components. (weight vectors not orthogonal though.)
+	- if non-linear, then can learn richer features than PCA.
+- if input and features are binary, and both encoder and decoder use sigmoid non-linearity, then very similar to Restricted Bolzmann Machine.
+- can add sparsity constraint to learn sparse features.
+- can stack auto-encoders, to learn higher level features. ("Greedy layerwise-learning")
+- can add class labels at output, remover decoders, and fine tune encoders using backprop. Useful if not much labelled data, but lots of unlabelled data.
+
+Semantic Hashing: learn to map documents to 20d binary codes. binary codes useful, since very efficient to search.
+	- can find similar documents based on hash. (involves no search at all, just hash lookup. 20d=> ~4gb index space)

@@ -1,0 +1,35 @@
+try to minimise mean squared error (MSE)
+define loss:
+  loss = Sum(i): { (y_pred_i - y_i )^2 } 
+  now:  
+     y_pred_i = m * x_i + b
+     loss = Sum(i): (m^2 * x_i^2 + 2*m*x_i*b + b^2 -2*m*x_i*y_i -2*b*y_i + y_i ^2 )
+
+
+     partial differential w.r.t b:
+     ∂Loss/∂b = Sum(i): { 2*m*x_i + 2b -2*y_i }
+              = 0 (for minimum loss)
+         b =  1/n Sum(i): { y_i  - m*x_i }
+         b = y_bar - m * x_bar
+
+     partial differential w.r.t. m:
+     ∂Loss/∂m = Sum(i): { 2*m*x_i^2 + 2*x_i*b - 2*x_i * y_i }
+              = 0 (for minimum loss)
+          subsitituting for b:
+            Sum(i): {  2*m*x_i^2 + 2*x_i* (y_bar - m*x_bar) -2*x_i * y_i  } = 0
+            Sum(i): {  m*x_i^2 + x_i*y_bar - m*x_i*x_bar -x_i*y_i } = 0
+
+      Now: consider normalised x and y: 
+        X_i = x_i-x_bar
+        Y_i = y_i-y_bar
+
+        x_i = X_i + x_bar
+        y_i = Y_i + y_bar
+
+      Substituting:
+          m * (X_i + x_bar)^2 + (X_i + x_bar) * y_bar - m*(X_i + x_bar)*x_bar - (X_i+x_bar)*(Y_i + y_bar)
+          m ( X_i^2 + 2*x_bar*X_i + x_bar^2) + X_i*y_bar + x_bar*y_bar - m*X_i*x_bar - m*x_bar^2 - (X_i*Y_i  + x_bar*Y_i + X_i*y_bar + x_bar*y_bar)
+          m ( X_i^2 + 2*x_bar*X_i + x_bar^2) - m*X_i*x_bar - m*x_bar^2 - X_i*Y_i  - x_bar*Y_i 
+          m ( X_i^2 + x_bar*X_i ) - X_i*Y_i  - x_bar*Y_i 
+          m = Sum(i){  }
+hmmm....? 
