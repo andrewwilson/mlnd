@@ -288,6 +288,10 @@ Maximum Likelihood Estimation: generates the choice most likely to have generate
 Maximum A Posteriori: is the choice most likely, given the observed data. argmax{h}: P(h|D)
 
 
+Cross-Validation
+-----------------
+If number of classes is unbalanced, use Stratified cross-validation, to ensure that each fold of data, contains representative instances of the classes. e.g. in extreme unbalanced cases, to avoid having folds that consist of just class which of course add no value to the training process.
+
 --------------------------
 Bay Area Deep Learning School
 ------------------------------
@@ -326,3 +330,19 @@ Autoencoders:
 
 Semantic Hashing: learn to map documents to 20d binary codes. binary codes useful, since very efficient to search.
 	- can find similar documents based on hash. (involves no search at all, just hash lookup. 20d=> ~4gb index space)
+
+Generative models
+	- conditional generation: P(image|partial image)
+	- fully observed models (NADE 2011, PixelCNN,PixelRNN 2016). can calc the prob density function for any pixel.
+	- Restricted Bolzmann Machines - try to learn latent structure in the data. Learn features similar to sparse coding.
+		- Deep bolzmann machines, stacked so higher level features are learnt.
+		- can be trained in an unsupervised way.
+
+Local versus Distributed Representation:
+	Models with a local representation. 
+		- e.g. Clustering, Nearest neighbours, RBF SVM, local density estimators.
+		- these have parameters to define regions of space that they represent. The number of parameters is linear with the number of regions
+	Models with distributed representation:
+		- e.g. RBMs, PCA, SparseCoding, Deep models, factor models
+		- each parameter affects many regions (not just local)
+		- number of regions grows roughly exponentially with the number of parameters.
