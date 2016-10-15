@@ -292,6 +292,99 @@ Cross-Validation
 -----------------
 If number of classes is unbalanced, use Stratified cross-validation, to ensure that each fold of data, contains representative instances of the classes. e.g. in extreme unbalanced cases, to avoid having folds that consist of just class which of course add no value to the training process.
 
+Unsupervised Learning
+----------------------
+Clustering: 
+K-Means
+	- Initialise: create K randomly located cluster centers
+	-	Repeat:
+		- assign: Assign points to closest cluster.
+		- optimise: update the location of each centre to minimise quadratic error to all points in the cluster 
+	 - in scikit learn: params to change: **n_clusters**, n_iterations, n_init (number of random initialisations it performs. (returns best result after this many restarts))
+	Limitations:
+		- is a hill climibing algorithm, so susceptible to local minima.
+		- the more cluster centers, the more likely to hit a local minimum.
+
+Single Linkage Clustering (SLC): ("hierarchical agglomerative clustering")
+	- initially all points are their own cluster
+	- intercluster distance is defined as the distance between the closest two points in the clusters.
+	- merge the 2 closest clusters
+	- repeat n-k times to make k clusters.
+	- if distances represent edge lengths of a graph, then this is a minimum spanning tree algorithm.
+	- running time is approx O(n^3)
+	Limitations: clusters tend to be "stringy"
+
+EM Soft Clustering
+	- cluster membership is non-binary.
+	- consider that data is drawn from K-gaussian disributions with known and fixed variance sigma, and that selection of which gaussian is uniform.
+	- Repeat:
+		- assign probability Z_i of membership of the cluster i to each data point (Expectation)
+		- given membership, compute max likelihood mean of cluster center (Maximisation)
+	- Note that we have real-valued membership of clusters.
+		- This algorithm similar to K-means. If cluster assignment used argmax, so points had binary cluster membership, then get k-means.
+
+Clustering Properties
+		clustering maps sets of distances d to set of clusters/partitions.
+		Possible (desirable) properties of a clustering alorithm:
+
+		- Richness: - if true then for any desired clustering, there is a distance matrix that would lead to the desired cluster assignments.
+
+		- Scale Invariance - if true then scaling the distances by a positive constant value doesnt change the cluster assignments. (e.g. change of units)
+
+		- Consistency - if true then shrinking the intra-cluster distances, and expanding the inter-cluster distances should not change the cluster assignments.
+
+		No algorithm can satify all 3 of these. (proof by Kleinberg) "Impossibility theorem"
+
+
+** check web site for clustering mini project.
+
+Feature Scaling
+----------------
+approach to scale features so that their contribution is comparable.. [usually in range 0..1]
+scaled feature X' <= (X-Xmin)/(Xmax-Xmin)
+- susceptible to outliers.
+?? can alsi use variance and mean based as an alternative ???
+sklearn.preprocessing...
+
+For some algorithms, feature scaling is very important. for others not.
+e.g.
+- Linear Regression, NOT important
+- Decision Trees, NOT imporant
+- SVM (RBF) - *is* important!
+- K-means clustering - *is* important.
+importance comes when an interplay between the dimensions features in the algorithm.
+
+Feature Selection
+------------------
+why? 
+- interpretability. 
+	 - good to understand which matter.
+	 - simplifies visualisation
+- curse of dimensionality! number of training samples needed is exponential in the number of features. O(2^N).
+- selecting best of N features, is also exponential, and an NP-hard problem.
+- 2 main approaches to tackle the problem:  Filtering & Wrapping
+Filtering: 
+	- filters features before passing to the learning algorithm
+	- fast
+Wrapping: 
+	- involves the learning algorithm in the search process. i.e. feedback from the learner guides the search.
+	- slow. but takes into account model bias 
+
+Decision trees use filtering to select features based on information gain.
+- could run decision tree learner, and then use the features that it selects, for use by a different algorithm. e.g. KNN
+- could even run decision tree until it overfits, so that lots of features are succe
+
+
+
+
+
+
+
+
+
+
+
+
 --------------------------
 Bay Area Deep Learning School
 ------------------------------
