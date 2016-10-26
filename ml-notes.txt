@@ -415,6 +415,8 @@ ICA - tries to find a linear transformation that makes the transformed features 
  - given observables, tries to deduce indepedent hidden variables giving rise to the observations.
  - e.g. the cocktail party problem - trying to determine independent speakers from microphones capturing different mixtures of all of them.
  - ICA featues are mutually independent, but not necessarily orthogonal.
+ - ICA works best for independent latent sources that are highly non-gaussian.
+ - doesn't order the features. just provides a bag of features.
 
 PCA vs ICA
 ------------
@@ -422,16 +424,36 @@ PCA
 - by maximising variance along uncorrelated dimensions, is about finding uncorrelated features.
 -  Gives ability to do reconstruction.
 - Central limit theorem: - sum (linear combination) of a large number of statistically independent variables - tends to a normal distribution.
-- if distributions of features are non-normally disributed, then PCA is probably the wrong thing to do and won't find independent features.
+- if distributions of features are non-normally disributed, then PCA is probably the wrong thing to do and won't find independent features. ICA assumed non-normal distribution.
+- Blind Source separation: ICA great for this. PCA really bad for this.
+- Applied to face images:
+    PCA finds: 1) brightness, 2) average face
+    ICA finds: feature selectors (nose, eyes, mouth, hair etc..)
+- Applied to Natural images:
+    - ICA finds *EDGES*
+- Applied to Documents:
+    - ICA finds *topics*
 
+- PCA is global and finds global features.
+- ICA is local and finds local features. / components
+- PCA find features needed for *reconstruction*
 
-
+Both techniques reveal underlying structure about the data. Good for data analysis, and understanding the data.
+Could then write specialised feature detectors (e.g. edge detectors) once we know what sort of features make up our data.
 
 Feature Transformation
 - why, since may learning algo's implicitly transform the features themselves?
 
-
-
+RCA - Random components Analysis
+--------------------------------
+- generates components in Random Directions!
+- works surprisingly well, esp. if next task is classification.
+Remember that in general, we're projecting to lower number of dimensions to overcome the Curse of Dimensionality.
+N -> M, where M << N. 
+Don't use a very small M. (e.g. not as small as PCA / ICA.)
+- but can still capture some correlations
+- Can also use M > N! (project into higher dimensional space, e.g. like perceptron solving XOR problem. or SVM kernel trick.)
+- big advantage: it's fast
 
 
 
@@ -490,3 +512,4 @@ Local versus Distributed Representation:
 		- e.g. RBMs, PCA, SparseCoding, Deep models, factor models
 		- each parameter affects many regions (not just local)
 		- number of regions grows roughly exponentially with the number of parameters.
+
