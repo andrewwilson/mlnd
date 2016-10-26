@@ -371,13 +371,64 @@ Wrapping:
 	- slow. but takes into account model bias 
 
 Decision trees use filtering to select features based on information gain.
-- could run decision tree learner, and then use the features that it selects, for use by a different algorithm. e.g. KNN
-- could even run decision tree until it overfits, so that lots of features are succe
+- could run decision tree learner, and then use the features that it selects, for use by a different algorithm. 
+e.g. KNN (which suffers from curse of dimensionality)
+- could even run decision tree until it overfits, so that lots of features are selected.
+
+- Filtering: based on information gain / variance  / entropy / gini index / non-redundant (non-linearly correlated) features.
+
+- Wrapping approaches:
+	- hill climbing
+	- randomized optimisation
+	- forward search (take feature 1, 2, 3 4; find best. e.g.#3 then try 3+1, 3+2, 3+4, 3+5... and find best. Keep repeating until performance doesnt substantially improve by adding an additional feature)
+	- backward search ( opposite. start with all features, and take turns to eliminate them. eliminate 1, then 2 etc. stop when perforance drops significantly.)
+Feature Relevance
+- feature is strongly relevant if removing it degrades the "Bayes Optimal Classifier"(B.O.C) (which is the theoretical best performing classifier possible
+- feature is weakly relevant, if for some subset of features, adding it to them improves B.O.C
+- otherwise irrelevant.
+relevance ~ information. measures effect on B.O.C
+usefulness ~ measures effect on some particular model / learner.
+
+Dimensionality Reduction / Feature Transformation
+---------------------------------------------------
+
+
+Principal Components Analysis - PCA
+
+Dot product of 2 vectors = 0 if orthogonal. 
+PCA useful for when:
+- latent features driving patterns in the data
+- dimensionality reduction
+	- useful to visualize high dimensional data in 2D/3D
+	- reduce noise
+	- to make other algorithms (regression/classification) work better because of fewer dimensional inputs.
+		- may reduce variance, and fitting to noise.
+- Principle components are defined as the directions in the data that maximise variance (minimise information loss)
+- the principle components ranked in order of greatest variance.
+- they are orthogonal to one another.
+
+Independent Components Analysis - ICA
+
+ICA - tries to find a linear transformation that makes the transformed features ** statistically independent **.
+ - i.e. to make mutual information between all pairs of the new features = 0.
+ - and make mutual information between set of original features and set of new features as high as possible.
+ - given observables, tries to deduce indepedent hidden variables giving rise to the observations.
+ - e.g. the cocktail party problem - trying to determine independent speakers from microphones capturing different mixtures of all of them.
+ - ICA featues are mutually independent, but not necessarily orthogonal.
+
+PCA vs ICA
+------------
+PCA 
+- by maximising variance along uncorrelated dimensions, is about finding uncorrelated features.
+-  Gives ability to do reconstruction.
+- Central limit theorem: - sum (linear combination) of a large number of statistically independent variables - tends to a normal distribution.
+- if distributions of features are non-normally disributed, then PCA is probably the wrong thing to do and won't find independent features.
 
 
 
 
-
+Feature Transformation
+- why, since may learning algo's implicitly transform the features themselves?
 
 
 
