@@ -433,6 +433,8 @@ PCA
     - ICA finds *EDGES*
 - Applied to Documents:
     - ICA finds *topics*
+- PCA is about linear algebra, and coincidentally about probability theory.
+- ICA is about probability & information theory.
 
 - PCA is global and finds global features.
 - ICA is local and finds local features. / components
@@ -440,9 +442,6 @@ PCA
 
 Both techniques reveal underlying structure about the data. Good for data analysis, and understanding the data.
 Could then write specialised feature detectors (e.g. edge detectors) once we know what sort of features make up our data.
-
-Feature Transformation
-- why, since may learning algo's implicitly transform the features themselves?
 
 RCA - Random components Analysis
 --------------------------------
@@ -455,7 +454,14 @@ Don't use a very small M. (e.g. not as small as PCA / ICA.)
 - Can also use M > N! (project into higher dimensional space, e.g. like perceptron solving XOR problem. or SVM kernel trick.)
 - big advantage: it's fast
 
+LDA - Linear Discriminant Analysis
+----------------------------------
+- finds a projection that discriminates based on a label. 
 
+
+
+Feature Transformation
+- why, since may learning algo's implicitly transform the features themselves?
 
 
 --------------------------
