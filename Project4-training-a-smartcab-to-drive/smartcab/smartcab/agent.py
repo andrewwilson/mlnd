@@ -176,7 +176,7 @@ def run():
     #   optimized    - set to True to change the default log file name
     sim = Simulator(env,
                     display=False,
-                    update_delay=0.01,
+                    update_delay=0,
                     log_metrics=True)
 
     ##############
@@ -188,4 +188,14 @@ def run():
 
 
 if __name__ == '__main__':
+    import datetime as dt
+    start = dt.datetime.now()
     run()
+    end = dt.datetime.now()
+    print "Test took: ", end - start
+
+# 1    - 5s
+# 10   - 8s
+# 20   - 11s
+# 100  - 34s
+# 200  - 62s

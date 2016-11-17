@@ -683,4 +683,10 @@ Possible reasons:
     - can perform error analysis. (look at examples that were classified wrongly)
     - easier to estimate bias / variance effects.
     e.g. if human level performance known on a problem, and train error and dev error, then can infer if it;s a bias or variance problem. With just train /dev can't tell...... Human perf is proxy for bayes error rate..
+- one possible workaround is to look for subsets of the data where performance is still worse than human.
 
+
+How to define human level performance?
+- single human 3%/ doctor 1%/ expert doctor 0.7%/ team of expert doctors. 0.5%
+    => use the best. Since what we use this for is a baseline mathematically optimal (bayes) error rate.
+    
