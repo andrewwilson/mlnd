@@ -464,9 +464,29 @@ Feature Transformation
 - why, since may learning algo's implicitly transform the features themselves?
 
 
---------------------------
+============================
+Reinforcement Learning
+============================
+
+3 approaches to RL:
+
+s-> [ ∏ ] -> a
+    - Policy search. learn policy. learning exactly what we need.
+    - however, dont get direct action to this during training.
+s-> [ U ] -> v
+    - Value Function based approaches. learn utility of state ( value of state - value function)
+    - easier to learn. however need to turn it into a policy to use it. (argmax)
+
+s,a -> [ T,R] -> s', r
+    Model based. T is transition function. R is reward.
+    Can use T,R to perform value iteration and solve Bellman equations, to get U.
+    Very direct output. can solve learning as supervised learning problem.
+
+
+
+==============================
 Bay Area Deep Learning School
-------------------------------
+==============================
 Videos: 
 
 Cirrascale - rent a box GPU offering
