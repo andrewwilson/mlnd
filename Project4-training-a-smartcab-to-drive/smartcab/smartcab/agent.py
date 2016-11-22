@@ -43,7 +43,9 @@ class LearningAgent(Agent):
             self.epsilon = 0
             self.alpha = 0
 
-        #TODO: decay epsilon
+        #decay epsilon
+        self.epsilon = max(0, self.epsilon - 0.05)
+        print "Epsilon is now:", self.epsilon
 
         return None
 
@@ -64,8 +66,9 @@ class LearningAgent(Agent):
         # When learning, check if the state is in the Q-table
         #   If it is not, create a dictionary in the Q-table for the current 'state'
         #   For each action, set the Q-value for the state-action pair to 0
-        
-        state = (waypoint, inputs['light'], inputs['left'], inputs['right'], inputs['oncoming'])
+
+        oncoming_bool = inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'right'
+        state = (waypoint, inputs['light'], oncoming_bool)
         self.createQ(state)
 
         return state
@@ -189,7 +192,8 @@ def run():
     #   learning   - set to True to force the driving agent to use Q-learning
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
-    agent = env.create_agent(LearningAgent)
+    agent = env.create_agent(LearningAgent,
+                             learning=True)
     
     ##############
     # Follow the driving agent
