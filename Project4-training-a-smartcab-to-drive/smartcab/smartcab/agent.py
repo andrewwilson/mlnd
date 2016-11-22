@@ -107,7 +107,9 @@ class LearningAgent(Agent):
         # When not learning, choose a random action
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
- 
+
+        action = random.choice(self.valid_actions)
+
         return action
 
 
@@ -175,8 +177,8 @@ def run():
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
     sim = Simulator(env,
-                    display=False,
-                    update_delay=0,
+                    display=True,
+                    update_delay=0.1,
                     log_metrics=True)
 
     ##############
