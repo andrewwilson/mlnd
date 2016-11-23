@@ -194,7 +194,7 @@ def run():
     #   num_dummies - discrete number of dummy agents in the environment, default is 100
     #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
     env = Environment(
-        verbose=True
+        verbose=False
     )
     
     ##############
@@ -206,7 +206,10 @@ def run():
     agent = env.create_agent(LearningAgent,
                              learning=True,
                              alpha=0.4,
-                             epsilon_decay_rate=0.99)
+                             epsilon=0.5,
+                             epsilon_decay_rate=0.95
+                             #epsilon_decay_step=0.005
+                             )
     
     ##############
     # Follow the driving agent
@@ -236,9 +239,19 @@ def run():
     #   n_test     - discrete number of testing trials to perform, default is 0
     sim.run(
         n_test=20,
-        tolerance=0.05
+        tolerance=0.001
+        # alpha = 0.5.
+        # 0.95 decay rate
+        # .03  /0.95 => 70 trials
+        # .02  /0.95 => 80 trials
+        # .01  /0.95 => 90 trials   D/B
+        # .005 /0.95 => 105 trials A+/A
+        # .001 /0.95 => 130 trials A+/A+
+        # .0005/0.95 => 145 trials A+/D
+        # reliability not so consistent.
     )
 
+#try lower starting epsilon, say 10%, then decay that slowly...
 
 if __name__ == '__main__':
     import datetime as dt
