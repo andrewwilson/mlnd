@@ -32,7 +32,7 @@ class Environment(object):
     valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # E, N, W, S
     hard_time_limit = -100  # Set a hard time limit even if deadline is not enforced.
 
-    def __init__(self, verbose=False, num_dummies=100, grid_size = (8, 6)):
+    def __init__(self, verbose=False, num_dummies=100, grid_size = (8, 6), text_output=True):
         self.num_dummies = num_dummies  # Number of dummy driver agents in the environment
         self.verbose = verbose # If debug output should be given
 
@@ -42,6 +42,7 @@ class Environment(object):
         self.agent_states = OrderedDict()
         self.step_data = {}
         self.success = None
+        self.text_output=text_output
 
         # Road network
         self.grid_size = grid_size  # (columns, rows)
@@ -180,11 +181,12 @@ class Environment(object):
         """ This function is called when a time step is taken turing a trial. """
 
         # Pretty print to terminal
-        print ""
-        print "/-------------------"
-        print "| Step {} Results".format(self.t)
-        print "\-------------------"
-        print ""
+        if self.text_output:
+            print ""
+            print "/-------------------"
+            print "| Step {} Results".format(self.t)
+            print "\-------------------"
+            print ""
 
         if(self.verbose == True): # Debugging
             print "Environment.step(): t = {}".format(self.t)

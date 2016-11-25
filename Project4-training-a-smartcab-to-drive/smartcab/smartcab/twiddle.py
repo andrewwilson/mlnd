@@ -1,7 +1,7 @@
 # https://www.youtube.com/watch?v=2uQ2BSzDvXs
 # https://martin-thoma.com/twiddle/
 
-def twiddle(params, param_deltas, fn, threshold, max_iter=10000, scaling=2.0, limits=None):
+def twiddle(params, param_deltas, fn, threshold, max_iter=10000, scaling=2.0, limits=None, progress_callback=None):
     """
 
     :param params: e.g. [0,0,0]
@@ -32,6 +32,8 @@ def twiddle(params, param_deltas, fn, threshold, max_iter=10000, scaling=2.0, li
             p[i] = limit(dp[i]+p[i], mn, mx)
 
             err = fn(p)
+            if progress_callback:
+                progress_callback(err, p, err <= best_err)
 
             if err < best_err:  # There was some improvement
                 best_err = err
@@ -39,6 +41,8 @@ def twiddle(params, param_deltas, fn, threshold, max_iter=10000, scaling=2.0, li
             else:  # There was no improvement
                 p[i] = limit(orig_p - dp[i], mn,mx)  # Go into the other direction
                 err = fn(p)
+                if progress_callback:
+                    progress_callback(err, p, err <= best_err)
 
                 if err < best_err:  # There was an improvement
                     best_err = err
@@ -53,7 +57,7 @@ def twiddle(params, param_deltas, fn, threshold, max_iter=10000, scaling=2.0, li
 def limit(x, mn, mx):
     upper_clipped = min(x,mx) if mx is not None else x
     lower_clipped = max(upper_clipped,mn) if mn is not None else upper_clipped
-    print "limit of ",x,mn,mx,"is", lower_clipped
+    #print "limit of ",x,mn,mx,"is", lower_clipped
     return lower_clipped
 
 if __name__ == '__main__':
@@ -65,16 +69,22 @@ if __name__ == '__main__':
         res = abs(x-100.013)**1.3 -5
 
         print "trying: ", x, res
-        X.append(x)
-        Y.append(res)
+        #X.append(x)
+        #Y.append(res)
         return res
 
     #print( func([199.34425354003906]))
 
+    def on_progress(err, params, best):
+        if best:
+            print  "Progress:", err, best, params
+            X.append(params[0])
+            Y.append(err)
+
 
     params = [0]
     param_deltas = [1]
-    print twiddle(params, param_deltas, func, 0.0001, scaling=10, limits=[[5,110.]])
+    print twiddle(params, param_deltas, func, 0.0001, scaling=10, limits=[[5,110.]], progress_callback=on_progress)
 
     import matplotlib.pyplot as plt
     plt.plot(X, 'o-')

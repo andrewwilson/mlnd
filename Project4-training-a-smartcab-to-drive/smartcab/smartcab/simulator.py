@@ -34,7 +34,7 @@ class Simulator(object):
         'gray'    : (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False):
+    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False, text_output=True):
         self.env = env
         self.size = size if size is not None else ((self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
@@ -53,6 +53,7 @@ class Simulator(object):
         self.update_delay = update_delay  # duration between each step (in seconds)
 
         self.display = display
+        self.text_output= text_output
         if self.display:
             try:
                 self.pygame = importlib.import_module('pygame')
@@ -108,7 +109,7 @@ class Simulator(object):
             self.log_writer = csv.DictWriter(self.log_file, fieldnames=self.log_fields)
             self.log_writer.writeheader()
 
-    def run(self, tolerance=0.05, n_test=0):
+    def run(self, tolerance=0.05, n_test=0, max_train=None):
         """ Run a simulation of the environment. 
 
         'tolerance' is the minimum epsilon necessary to begin testing (if enabled)
@@ -129,9 +130,11 @@ class Simulator(object):
 
             # Flip testing switch
             if not testing:
-                if total_trials > 20: # Must complete minimum 20 training trials
+                if total_trials > min(max_train,20): # Must complete minimum 20 training trials (unless max train set lower for debugging)
                     if a.learning:
-                        if a.epsilon < tolerance: # assumes epsilon decays to 0
+                        # assumes epsilon decays to 0
+                        if a.epsilon < tolerance \
+                                or max_train and total_trials > max_train: # limit max training cycles
                             testing = True
                             trial = 1
                     else:
@@ -144,15 +147,16 @@ class Simulator(object):
                     break
 
             # Pretty print to terminal
-            print 
-            print "/-------------------------"
-            if testing:
-                print "| Testing trial {}".format(trial)
-            else:
-                print "| Training trial {}".format(trial)
+            if self.text_output:
+                print
+                print "/-------------------------"
+                if testing:
+                    print "| Testing trial {}".format(trial)
+                else:
+                    print "| Training trial {}".format(trial)
 
-            print "\-------------------------"
-            print 
+                print "\-------------------------"
+                print
 
             self.env.reset(testing)
             self.current_time = 0.0
@@ -183,7 +187,8 @@ class Simulator(object):
                         self.last_updated = self.current_time
                     
                     # Render text
-                    self.render_text(trial, testing)
+                    if self.text_output:
+                        self.render_text(trial, testing)
 
                     # Render GUI and sleep
                     if self.display:
@@ -213,12 +218,13 @@ class Simulator(object):
                 })
 
             # Trial finished
-            if self.env.success == True:
-                print "\nTrial Completed!"
-                print "Agent reached the destination."
-            else:
-                print "\nTrial Aborted!"
-                print "Agent did not reach the destination."
+            if self.text_output:
+                if self.env.success == True:
+                    print "\nTrial Completed!"
+                    print "Agent reached the destination."
+                else:
+                    print "\nTrial Aborted!"
+                    print "Agent did not reach the destination."
 
             # Increment
             total_trials = total_trials + 1
@@ -243,7 +249,8 @@ class Simulator(object):
 
             self.log_file.close()
 
-        print "\nSimulation ended. . . "
+        if self.text_output:
+            print "\nSimulation ended. . . "
 
         # Report final metrics
         if self.display:

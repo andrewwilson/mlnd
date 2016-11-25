@@ -44,17 +44,20 @@ class LearningAgent(Agent):
         if testing:
             self.epsilon = 0
             self.alpha = 0
+            print "testing. Epsilon & alpha = 0"
 
         #decay epsilon
         eps_before = self.epsilon
         if self.epsilon_decay_rate:
             self.epsilon = self.epsilon * self.epsilon_decay_rate
+            print "Epsilon update from", eps_before, "to", self.epsilon
         else:
             if self.epsilon_decay_step:
                 self.epsilon = max(0, self.epsilon - self.epsilon_decay_step)
+                print "Epsilon update from", eps_before, "to", self.epsilon
 
 
-        print "Epsilon update from", eps_before, "to", self.epsilon
+
 
         return None
 

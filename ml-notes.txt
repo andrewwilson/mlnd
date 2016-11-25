@@ -710,3 +710,23 @@ How to define human level performance?
 - single human 3%/ doctor 1%/ expert doctor 0.7%/ team of expert doctors. 0.5%
     => use the best. Since what we use this for is a baseline mathematically optimal (bayes) error rate.
     
+What can AI/DL do?
+- rules of thumb:
+1) anything that a person can do in < 1 second.
+- e.g. many perception related tasks.
+2) predicting outcome of next in a sequence of events.
+
+Career in Machine Learning
+- ML Course
+- DL School
+- Kaggle
+- (1) PhD student process
+    - read a lot of papers
+    - ** work on replicating results **
+    => this tends to generate a capability to improve on the state of the art.
+- (2) dirty work
+    - downloading data
+    - tuning params
+    - debugging
+- Needs a balance of (1) & (2) to become a great researcher.
+
