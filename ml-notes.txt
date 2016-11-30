@@ -730,3 +730,145 @@ Career in Machine Learning
     - debugging
 - Needs a balance of (1) & (2) to become a great researcher.
 
+
+Foundations of Deep Reinforcement Learning - John Schulman
+-----------------------------------------------------------
+*Deep* reinforcement learning - the deep means using a neural net as a function approximator
+- some choices over what it could approximate:
+    - could learn the policy (used to select the next action)
+    - could learn the value function (goodness of states of state/action pairs)
+    - could learn a model (makes predictions about next states / rewards.)
+
+Example use cases:
+Robotics:
+- observations: camera images, joint angles
+- outputs: join torques
+- reward: can choose: stay balanced, navigate to location, serve & protect humans..
+
+Inventory Management:
+- observations: stock levels
+- actions: number of items to purchase 
+- reward: profit
+
+Attention:
+- fous on part of input
+- observation: current image 
+- action: where to look/crop
+- reward: classification success.
+
+Machine translation:
+- non-differentiable, so can use policy gradients to optimise systems like this.
+ref: Mnih et al. "Recurrent Models of Visual Attention"
+
+Non-differentiable processes are a common situation where RL potentially useful.
+In the general case:
+    Environment samples input x_t ~ P(xt| x_t-1, y_t-1)
+    - tricky because input is dependent upon the historic actions chosen.
+    - can lead to instability in learning.
+    - get delayed reaction, acting greedily at each time step now enough.
+
+Differences between RL and Supervised learining.   
+    (1) - dont have full analytic access to the function you're trying to optimise - must query it through interaction
+    (2) - interacting with a stateful word, input depends on previous actions.
+
+    "Contextual Bandit" problems, are those where just (1) applies.
+
+Should I use deep RL
+- could be overkill. new technique, often doesnt work out of the box.
+- if problem has small number of params, and have simulator, then "derivative free optimisation" methods may do better.
+        - simulated annealing
+        - cross entropy methods
+        - SPSA
+- is it a "contextual bandit problem"? (not stateful)
+    - if so, better understood and have own set of good methods
+
+- "Vizdoom" contest.
+
+- MDP:  [19:00]
+>>> note terminology here
+
+- "Episodic MDP"
+    - taxi robot. episode is 1 trip. termination is good. (as fast as possible)
+    - waiter robot. finished shift. (time based)
+    - walking robot. / life.. (termination is bad, prolong episode as long as possible)
+
+    Maximise expected reward over episode
+
+Parameterised policies
+    parameterised policies, parameterised by param vector theta
+    policy can be deterministic or stochastic
+        a = π(s, theta)
+        a ~ π(a|s, theta)
+    analogous to classification or regression with input s, output a.
+        - for discrete action space, network outputs vector of probabilities of each a. (classifier)
+        - continuous action space, network outputs mean and diagonal of covariance matrix of Gaussian (like regression)
+
+ Policy Gradient Methods [25:50]
+    Problem: maximise E[R|π(theta)]
+    Intuition: collect a bunch of trajectories, then:
+    1) try to make the good trajectories more probable.
+    2) (better) make the good actions more probable.
+    3) try to push the actions towards good actions. ( 
+        e.g. DPG (Deterministic policy gradients(silver et al), 
+        SVG Stochastic Value Gradients)
+
+    focus on 1,2
+    Score function gradient estimator. [28:53]
+    - general technique, can be used in different machine learning settings.
+    Given E_{x~p(x|theta)} [f(x)], we want gradient w.r.t theta.
+    - can get an unbiased estimator of a gradient:
+        -  by sampling x_i ~ p(x|theta), and calculate:
+            g_i = f(x_i) Grad_theta p(x_i|theta)
+
+            need to be able to differentiate p(x|theta) w.r.t theta.
+            however, overal gradient is valid even if f(x) is non-differentiable/discontinuous/not available analytically.
+
+            - derivation for how to use for policy gradient, ending at [36:36]
+
+
+        Variance Reduction:
+        - add baseline return
+        - discount factor, removes effects from far into the future.
+
+
+        Some techniques reduce variance at the cost of bias. 
+            - e.g. Actor Critic, Reparameterisation trick.
+        High variance - can always address with more data.
+        High bias - basically screwed.
+
+            - "vanilla" policy gradient algorithm ending at [45:08]
+
+Step sizes are a big deal in RL:
+    - step to far => bad policy
+    - next data collected is from bad policy. => never recover.
+    "Trust region policy optimisation": - looks at policy before and after update. Uses K-L divergence to check that the update is not too extreme.
+
+Examples: Humanoid robot - walking
+Mojoko realistic physics simulator
+NNet policy
+inputs: joint angles and velocities
+output: joint torques @ 100hz
+reward: move forward as fast as possible
+episode ends when head goes below level.
+
+Humanoid robot - getting up 
+    - reward set by head height above the ground
+
+   How to deal with long time scales: - hierarchical RL is a possible solution.. 
+   e.g. without it, then n timesteps ~ 1/(1-gamma) steps are a problem.
+
+Policy gradient approaches: intuitive, in that we're getting gradient of exactly what we want and using it to optimise policy directly.
+
+Q Function learning methods
+-----------------------------
+These are learning a measure of the goodness of the state-action pairs.
+Can exactly solve MDPs with finite set of states and actions.
+Also can be used in continuous settings, with neural networks as function approximators.
+
+Q function, Q{π}(s,a)  is the expected discounted sum of rewards, conditioned on the first state and action, whilst acting under the policy π.
+(State) Value function V{π}(s), measure of how good a state is. (is expected reward from that state.)
+Advantage: A{π}(s,a) = Q-V. How much better a particular action is than the reward for the state overall.
+
+Q functions can be updated using Bellman equations. Bellman equation is a consistency equation that should be satisfied by value function.
+
+Bellman Backups [1:03:00]

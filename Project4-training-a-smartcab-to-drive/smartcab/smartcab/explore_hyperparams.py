@@ -2,6 +2,7 @@ from agent import LearningAgent
 from environment import Environment
 from simulator import Simulator
 from twiddle import twiddle
+from multiprocessing import Pool
 
 import datetime as dt
 import pandas as pd
@@ -22,7 +23,15 @@ def calc_error_score(sim):
     # twiddle attempts to minimise score, which it interprets as an error, so return -1* our score here.
     return -1 * score
 
-def run_test(alpha, epsilon, epsilon_decay_step):
+def run_test(params):
+
+    alpha = params[0]
+    epsilon = params[1]
+    epsilon_decay_rate = params[2]
+    log_suffix = params[3]
+
+
+    print "Running test with: alpha:", alpha, "epsilon", epsilon, "epsilon_decay_rate", epsilon_decay_rate, "log_suffix",log_suffix
 
     ##############
     # Create the environment
@@ -40,8 +49,8 @@ def run_test(alpha, epsilon, epsilon_decay_step):
                              learning=True,
                              alpha=alpha,
                              epsilon=epsilon,
-                             #epsilon_decay_rate=epsilon_decay_rate
-                             epsilon_decay_step=epsilon_decay_step
+                             epsilon_decay_rate=epsilon_decay_rate
+                             #epsilon_decay_step=epsilon_decay_step
                              )
 
     # Follow the driving agent
@@ -54,15 +63,15 @@ def run_test(alpha, epsilon, epsilon_decay_step):
                     update_delay=0,
                     log_metrics=True,
                     optimized=True,
-                    text_output=False)
+                    text_output=False,
+                    log_suffix=log_suffix)
 
     # Run the simulator
     sim.run(
-        n_test=10,
+        n_test=20,
         tolerance=0.01,
-        max_train=200
+        max_train=500
     )
-
 
     # calculate error score
     score = calc_error_score(sim)
@@ -71,18 +80,16 @@ def run_test(alpha, epsilon, epsilon_decay_step):
 
 def run_test_wrapper(params):
 
-    alpha = params[0]
-    epsilon = params[1]
-    epsilon_decay_step = params[2]
 
-    print "## Running test with: alpha:", alpha, "epsilon", epsilon, "epsilon_decay_step", epsilon_decay_step
-
-    N = 10 # train N models with these params and average the scores after testing each of them.
+    N = 20 # train N models with these params and average the scores after testing each of them.
     start = dt.datetime.now()
 
-    scores = []
-    for _ in range(N):
-        scores.append(run_test(alpha, epsilon, epsilon_decay_step))
+    task_args = [ params + [ "_" + str(i+1)] for i in range(N) ]
+
+    print "Running ",N," tests with params",params
+
+    scores = pool.map(run_test, task_args, chunksize=2)
+    print "## Scores were:", scores
 
     score = np.mean(scores)
     print "## mean,std", score, np.std(scores)
@@ -98,14 +105,14 @@ if __name__ == '__main__':
 
     params = [
         0.5,    # alpha
-        0.5,    # epsilon
-        0.05,    # epsilon_decay_step
+        1.0,    # epsilon
+        0.98,    # epsilon_decay_rate
     ]
 
     limits = [
         [0.001, 1.0], # alpha
         [0.01, 1.0],   # epsilon
-        [0.001, 1.0],   # epsilon_decay_step
+        [0.001, 0.999],   # epsilon_decay_rate
     ]
 
     # initial changes for parameter exploration
@@ -115,6 +122,8 @@ if __name__ == '__main__':
         0.01
     ]
 
-    results = twiddle(params, param_deltas, run_test_wrapper, threshold=0.001, max_iter=10, scaling=2.0, limits=limits)
+    pool = Pool(processes=10)
+
+    results = twiddle(params, param_deltas, run_test_wrapper, threshold=0.001, max_iter=50, scaling=2.0, limits=limits)
     print "Result:", results
 

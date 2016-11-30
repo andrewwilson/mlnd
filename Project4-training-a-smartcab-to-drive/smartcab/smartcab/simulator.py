@@ -34,7 +34,7 @@ class Simulator(object):
         'gray'    : (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False, text_output=True):
+    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False, text_output=True, log_suffix=""):
         self.env = env
         self.size = size if size is not None else ((self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
@@ -94,15 +94,15 @@ class Simulator(object):
             # Set log files
             if a.learning:
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
-                    self.log_filename = os.path.join("logs", "sim_improved-learning.csv")
-                    self.table_filename = os.path.join("logs","sim_improved-learning.txt")
+                    self.log_filename = os.path.join("logs", "sim_improved-learning" + str(log_suffix) + ".csv")
+                    self.table_filename = os.path.join("logs","sim_improved-learning" + str(log_suffix) + ".txt")
                 else: 
-                    self.log_filename = os.path.join("logs", "sim_default-learning.csv")
-                    self.table_filename = os.path.join("logs","sim_default-learning.txt")
+                    self.log_filename = os.path.join("logs", "sim_default-learning" + str(log_suffix) + ".csv")
+                    self.table_filename = os.path.join("logs","sim_default-learning" + str(log_suffix) + ".txt")
 
                 self.table_file = open(self.table_filename, 'wb')
             else:
-                self.log_filename = os.path.join("logs", "sim_no-learning.csv")
+                self.log_filename = os.path.join("logs", "sim_no-learning" + str(log_suffix) + ".csv")
             
             self.log_fields = ['trial', 'testing', 'parameters', 'initial_deadline', 'final_deadline', 'net_reward', 'actions', 'success']
             self.log_file = open(self.log_filename, 'wb')

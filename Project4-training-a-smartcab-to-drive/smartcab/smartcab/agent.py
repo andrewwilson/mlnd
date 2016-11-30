@@ -197,7 +197,8 @@ def run():
     #   num_dummies - discrete number of dummy agents in the environment, default is 100
     #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
     env = Environment(
-        verbose=False
+        verbose=False,
+        text_output=False
     )
     
     ##############
@@ -208,10 +209,10 @@ def run():
     #    * alpha   - continuous value for the learning rate, default is 0.5
     agent = env.create_agent(LearningAgent,
                              learning=True,
-                             alpha=0.4,
-                             epsilon=0.5,
-                             epsilon_decay_rate=0.95
-                             #epsilon_decay_step=0.005
+                             alpha=0.2,
+                             epsilon=1.0,
+                             epsilon_decay_rate=0.99
+                             #epsilon_decay_step=0.001
                              )
     
     ##############
@@ -220,7 +221,8 @@ def run():
     #   enforce_deadline - set to True to enforce a deadline metric
 
     env.set_primary_agent(agent,
-                          enforce_deadline=True)
+                          enforce_deadline=True
+                          )
 
     ##############
     # Create the simulation
@@ -233,7 +235,8 @@ def run():
                     display=False,
                     update_delay=0.0,
                     log_metrics=True,
-                    optimized=True)
+                    optimized=True,
+                    text_output=False)
 
     ##############
     # Run the simulator
@@ -242,19 +245,10 @@ def run():
     #   n_test     - discrete number of testing trials to perform, default is 0
     sim.run(
         n_test=20,
-        tolerance=0.001
-        # alpha = 0.5.
-        # 0.95 decay rate
-        # .03  /0.95 => 70 trials
-        # .02  /0.95 => 80 trials
-        # .01  /0.95 => 90 trials   D/B
-        # .005 /0.95 => 105 trials A+/A
-        # .001 /0.95 => 130 trials A+/A+
-        # .0005/0.95 => 145 trials A+/D
-        # reliability not so consistent.
+        tolerance=0.01,
+        max_train=1000
     )
 
-#try lower starting epsilon, say 10%, then decay that slowly...
 
 if __name__ == '__main__':
     import datetime as dt
@@ -263,8 +257,3 @@ if __name__ == '__main__':
     end = dt.datetime.now()
     print "Test took: ", end - start
 
-# 1    - 5s
-# 10   - 8s
-# 20   - 11s
-# 100  - 34s
-# 200  - 62s
