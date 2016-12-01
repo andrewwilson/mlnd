@@ -79,7 +79,7 @@ class LearningAgent(Agent):
         #   If it is not, create a dictionary in the Q-table for the current 'state'
         #   For each action, set the Q-value for the state-action pair to 0
 
-        oncoming_bool = inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'right'
+        oncoming_bool = inputs['oncoming'] in ['forward', 'right']
         state = (waypoint, inputs['light'], oncoming_bool)
         self.createQ(state)
 
@@ -109,14 +109,8 @@ class LearningAgent(Agent):
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
 
-        if self.learning:
-            q_table_state = self.Q.get(state)
-            if q_table_state is None:
-                q_table_state = dict()
-                self.Q[state] = q_table_state
-                # set q value to zero for all states
-                for action in self.valid_actions:
-                    q_table_state[action] = 0.0
+        if self.learning and state not in self.Q:
+            self.Q[state] = {action: 0 for action in self.valid_actions}
 
         return
 
@@ -141,9 +135,10 @@ class LearningAgent(Agent):
                 # with probability epsilon choose a random action
                 action = random.choice(self.valid_actions)
             else:
-                # select action with max q value
-                q_by_action = self.Q[state]
-                action = max(q_by_action, key=q_by_action.get) # argmax
+                # select random action from among those with max q value
+                max_q = self.get_maxQ(state)
+                action = random.choice([ a for a in self.valid_actions if self.Q[state][a] == max_q])
+
         else:
             # not learning - choose a random action.
             action = random.choice(self.valid_actions)
@@ -165,9 +160,9 @@ class LearningAgent(Agent):
         #   Q(s,a) <- Q(s,a) + alpha( r + gamma * max{a'}Q(s',a') - Q(s,a))
         #          = Q(s,a)(1-alpha)  + alpha( r + gamma * max{a'}Q(s',a') )
 
-        #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
+        #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma'). i.e. gamma = 0.
         if self.learning:
-            self.Q[self.state][action] = (1-self.alpha)* self.Q[self.state][action] + self.alpha * (reward + self.get_maxQ(state))
+            self.Q[self.state][action] = (1-self.alpha)* self.Q[self.state][action] + self.alpha * reward
 
         return
 
@@ -212,7 +207,7 @@ def run():
                              alpha=0.2,
                              epsilon=1.0,
                              epsilon_decay_rate=0.99
-                             #epsilon_decay_step=0.001
+                             #epsilon_decay_step=0.05
                              )
     
     ##############
