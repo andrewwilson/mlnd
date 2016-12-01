@@ -161,7 +161,7 @@ class LearningAgent(Agent):
         ###########
         # When learning, implement the value iteration update rule
 
-        # From Sutton/Barto Section 6.5, Q learning update rule is:
+        # From Sutton/Barto (Sep2016) Section 6.5, Q learning update rule is:
         #   Q(s,a) <- Q(s,a) + alpha( r + gamma * max{a'}Q(s',a') - Q(s,a))
         #          = Q(s,a)(1-alpha)  + alpha( r + gamma * max{a'}Q(s',a') )
 
