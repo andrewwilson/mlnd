@@ -550,7 +550,7 @@ Stochastic Generative Model. from 1995. Never worked! used "wake/sleep" algorith
     - Helmholz machine -  has directed connections. has seperate recogition model and generative part.
     - DBM undirected connections. all connections are both recignition and generative. tries to reach equilibrium state. 
 
-Variational Autoencoders
+Variational Autoencoders ~ 58:45
 --------------------------
 - is a Helmholz machine.
 - learns potentially complex probability distributions.
@@ -562,6 +562,11 @@ Variational Autoencoders
     - do back propagation through the deterministic part, and sample from the stochastic part.
 - can be used as generative models. e.g. generate images from text.
 - the stochasticity is important in generative models, so that a whole distribution of possible outcomes is generated, rather than just a single example. e.g. many different images, not just a single one.
+
+Generative Adversarial Networks ~ 1:13:00
+------------------------------------------
+
+bidirectionsl GRUs as preprocessing step for text. as alternative to word2vec.
 
 
 Andrew Ng Talk
@@ -872,3 +877,32 @@ Advantage: A{π}(s,a) = Q-V. How much better a particular action is than the rew
 Q functions can be updated using Bellman equations. Bellman equation is a consistency equation that should be satisfied by value function.
 
 Bellman Backups [1:03:00]
+
+Summary:
+       work out of box  | simple and scalable  |  Data efficient
+Vanilla PG   OK             Good                    Bad
+Natural PG   Good           Bad                     OK
+Q-Learning   Bad            Good                    OK
+
+Sim versus real world. Can be done in real world. e.g. ~ 2 weeks real time.
+Nnet architecture not esp. important.
+incremental rewards makes things easier (exploration problem)
+
+
+---- Udacity Deep Learning ---------------
+
+RNNS.
+naive model would need to be very deep to get a long lookback through time. (would need a layer per time step)
+instead, we use weight tying, so have single model responsible for summarising the past and providing the information to the classifier.
+get be many correllated updates => bad for SGD, which is more stable with uncorrelated updates.
+the isse is the vanishing and exploding gradients.
+exploding gradients: solve using gradient clipping!
+vanishing gradients: 
+
+
+
+Bay Area Deep Learning - tensorflow tutorial
+-----------------------------------------------
+
+- on github, tensorflow models.
+- lots of prebuilt stuff, inception, autoencoders, spatial tranformer (for localisation presumably)

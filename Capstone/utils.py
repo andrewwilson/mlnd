@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 from collections import namedtuple
+from functools import partial
 
 
 def split_dataset(ds, *sizes):
@@ -35,29 +36,6 @@ def load_stock_data(sym):
     return df
 
 
-def logreturn(px_latest, px_prev):
-    return np.log(px_latest/px_prev)
-
-def logreturn_features_and_targets(df, return_lookbacks=[1], target_lookaheads=[1]):
-    results = pd.DataFrame(index=df.index)  
-    feature_cols = []
-    target_cols = []
-    
-    for lb in return_lookbacks:
-        col = 'lret-' + str(lb)
-        results[col] = logreturn(df['px'], df['px'].shift(lb))
-        feature_cols.append(col)       
-    
-    # add target feature to predict
-    for la in target_lookaheads:
-        col = 'target-' + str(la)
-        results[col] = logreturn(df['px'].shift(-la), df['px'])
-        target_cols.append(col)
-        
-    results = results.dropna()
-    
-    return results[feature_cols], results[target_cols]
-
 DataSet = namedtuple('DataSet', ['name', 'X_train', 'Y_train', 'X_dev', 'Y_dev', 'X_test', 'Y_test'])
 
 def load_stock_datasets(features_and_targets_fn, train_frac=75, dev_frac=15, test_frac=15, sym_filter_fn=lambda x:True):
@@ -76,3 +54,74 @@ def load_stock_datasets(features_and_targets_fn, train_frac=75, dev_frac=15, tes
             ds = DataSet(sym, X_train, Y_train, X_dev, Y_dev, X_test, Y_test)
             res[sym] = ds
     return res
+
+
+def logreturn(px_latest, px_prev):
+    return np.log(px_latest/px_prev)
+
+
+def FT_logreturn_vs_logreturn(df, return_lookbacks=[1], target_lookaheads=[1]):
+    """ features and targets function: 
+        features: - log returns with various lookbacks.
+        targets: - log return
+    """
+    results = pd.DataFrame(index=df.index)  
+    feature_cols = []
+    target_cols = []   
+    for lb in return_lookbacks:
+        col = 'lret-' + str(lb)
+        results[col] = logreturn(df['px'], df['px'].shift(lb))
+        feature_cols.append(col)     
+
+    # add target feature to predict
+    for la in target_lookaheads:
+        col = 'target-' + str(la)
+        results[col] = logreturn(df['px'].shift(-la), df['px'])
+        target_cols.append(col)
+        
+    results = results.dropna() # so that features and targets are all complete, and have aligned samples   
+    return results[feature_cols], results[target_cols]
+
+def FT_ma_ewma_abs_logreturns_vs_abs_logreturn(df, ma_windows = [10], ewma_halflifes = [10]):
+    """ features and targets function: 
+        features: 
+        - moving average of abs log return with various lookbacks.
+        - ewma of abs log return with various lookbacks
+        targets:
+        - abs log return
+    """
+    results = pd.DataFrame(index=df.index)  
+    feature_cols = []
+    target_cols = []
+    
+    vol = logreturn(df['px'], df['px'].shift(1)).abs()
+    results['vol'] = vol
+    feature_cols.append('vol')
+    future_vol = vol.shift(-1)
+    for ma_win in ma_windows:
+        col = 'ma-' + str(ma_win)
+        ma = vol.rolling(ma_win).mean()
+        results[col] = ma
+        feature_cols.append(col)     
+    
+    for ewma_hl in ewma_halflifes:
+        col = 'ewma-' + str(ewma_hl)
+        ewma = vol.ewm(halflife=ewma_hl).mean()
+        results[col] = ewma
+        feature_cols.append(col)     
+
+    # add target feature to predict
+    results['target-1'] = future_vol
+    target_cols.append('target-1')
+        
+    results = results.dropna() # so that features and targets are all complete, and have aligned samples   
+    return results[feature_cols], results[target_cols]
+
+
+def load_ds1():
+    features_and_targets = partial(FT_logreturn_vs_logreturn, return_lookbacks=np.arange(40)+1, target_lookaheads=[1])
+    return load_stock_datasets(features_and_targets)
+
+def load_ds2():
+    features_and_targets = partial(FT_ma_ewma_abs_logreturns_vs_abs_logreturn, ma_windows=np.arange(40)+1, ewma_halflifes=np.arange(40)+1)
+    return load_stock_datasets(features_and_targets)
