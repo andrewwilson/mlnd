@@ -35,6 +35,10 @@ def load_stock_data(sym):
     del df['Adjusted Close']
     return df
 
+def random_price_series(samples, std):
+    px = pd.Series(((np.random.randn(samples)*std) + 1).cumprod(), name='px')
+    return pd.DataFrame(px)
+
 
 DataSet = namedtuple('DataSet', ['name', 'X_train', 'Y_train', 'X_dev', 'Y_dev', 'X_test', 'Y_test'])
 
@@ -53,6 +57,24 @@ def load_stock_datasets(features_and_targets_fn, train_frac=75, dev_frac=15, tes
 
             ds = DataSet(sym, X_train, Y_train, X_dev, Y_dev, X_test, Y_test)
             res[sym] = ds
+    return res
+
+def create_random_datasets(features_and_targets_fn,  
+                           samples=6000, train_frac=75, dev_frac=15, test_frac=15, 
+                           syms_to_std_map = {'S1':0.015} ):
+    
+    res = {}
+    for sym in syms_to_std_map.keys():
+        std = syms_to_std_map[sym]
+        raw = random_price_series(samples=samples, std=std)
+        train, dev, test = split_dataset(raw, train_frac, dev_frac, test_frac)
+
+        X_train, Y_train = features_and_targets_fn(train)
+        X_dev, Y_dev = features_and_targets_fn(dev)
+        X_test, Y_test = features_and_targets_fn(test)
+
+        ds = DataSet(sym, X_train, Y_train, X_dev, Y_dev, X_test, Y_test)
+        res[sym] = ds
     return res
 
 
@@ -82,7 +104,7 @@ def FT_logreturn_vs_logreturn(df, return_lookbacks=[1], target_lookaheads=[1]):
     results = results.dropna() # so that features and targets are all complete, and have aligned samples   
     return results[feature_cols], results[target_cols]
 
-def FT_ma_ewma_abs_logreturns_vs_abs_logreturn(df, ma_windows = [10], ewma_halflifes = [10]):
+def FT_ma_ewma_abs_logreturns_vs_abs_logreturn(df, ma_windows = [10], ewma_halflifes = [10], lret_lookbacks = []):
     """ features and targets function: 
         features: 
         - moving average of abs log return with various lookbacks.
@@ -108,7 +130,13 @@ def FT_ma_ewma_abs_logreturns_vs_abs_logreturn(df, ma_windows = [10], ewma_halfl
         col = 'ewma-' + str(ewma_hl)
         ewma = vol.ewm(halflife=ewma_hl).mean()
         results[col] = ewma
-        feature_cols.append(col)     
+        feature_cols.append(col) 
+        
+    for lb in lret_lookbacks:
+        col = 'lret-' + str(lb)
+        lret_lb = vol.shift(lb)
+        results[col] = lret_lb
+        feature_cols.append(col) 
 
     # add target feature to predict
     results['target-1'] = future_vol
@@ -125,3 +153,7 @@ def load_ds1():
 def load_ds2():
     features_and_targets = partial(FT_ma_ewma_abs_logreturns_vs_abs_logreturn, ma_windows=np.arange(40)+1, ewma_halflifes=np.arange(40)+1)
     return load_stock_datasets(features_and_targets)
+
+def load_ds2_rand(syms_to_std_map={'S1':0.03}):
+    features_and_targets = partial(FT_ma_ewma_abs_logreturns_vs_abs_logreturn, ma_windows=np.arange(40)+1, ewma_halflifes=np.arange(40)+1)
+    return create_random_datasets(features_and_targets, syms_to_std_map=syms_to_std_map)
