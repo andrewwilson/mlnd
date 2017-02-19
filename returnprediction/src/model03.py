@@ -44,17 +44,18 @@ def add_features(px):
     return df
 
 
-def target(price_series, units, categories, lookahead):
+
+# target is up only. is future return over threshold
+def target(price_series, lookahead, threshold):
     y = logreturn(price_series, price_series.shift(-lookahead))
     y = y-y.mean()
-    clip = (categories-1)/2
-    y = clip + np.clip(y/units,-clip,clip).dropna().astype(int)
+    y = 1*(y > threshold)
     return y
 
-def preprocess(price_series, categories=3, units=0.0010, lookahead=10, vol_adjust=24*60*5):
+def preprocess(price_series, lookahead=60, threshold=0.0050, vol_adjust=24*60*5):
     px = normalise_price(price_series, vol_adjust=vol_adjust)
     X = add_features(px).dropna()
-    y = target(price_series, units=units, categories=categories, lookahead=lookahead).dropna()
+    y = target(price_series, lookahead=lookahead, threshold=threshold).dropna()
     # align series after NA's removed
     idx = X.index.intersection(y.index)
 
@@ -62,7 +63,7 @@ def preprocess(price_series, categories=3, units=0.0010, lookahead=10, vol_adjus
     y = y.ix[idx]
     return X,y
 
-def build_model(n_features, n_categories, loss='categorical_crossentropy'):
+def build_model(n_features, loss='categorical_crossentropy'):
     model = Sequential()
 
     model.add(Dense(500, input_dim=n_features, activation='relu', init='he_normal'))
@@ -73,7 +74,7 @@ def build_model(n_features, n_categories, loss='categorical_crossentropy'):
     model.add(Dropout(0.5))
     model.add(Dense(500, activation='relu', init='he_normal'))
     model.add(Dropout(0.5))
-    model.add(Dense(output_dim=n_categories, activation='softmax', init='he_normal'))
+    model.add(Dense(output_dim=2, activation='softmax', init='he_normal'))
 
     model.compile(loss=loss, optimizer='adam')
 

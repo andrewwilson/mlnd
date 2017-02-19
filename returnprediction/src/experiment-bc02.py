@@ -36,7 +36,7 @@ if LIM:
 model = build_model(X_train.shape[1], n_categories=CATEGORIES, loss='categorical_crossentropy')
 
 
-train_model(RUN_ID, model, epochs=EPOCHS)
+train_model(RUN_ID, model, X_train, y_train, epochs=EPOCHS)
 
 from keras.utils import np_utils
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score

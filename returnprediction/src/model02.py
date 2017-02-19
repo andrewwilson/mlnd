@@ -76,3 +76,5 @@ def build_model(n_features, n_categories, loss='categorical_crossentropy'):
     model.add(Dense(output_dim=n_categories, activation='softmax', init='he_normal'))
 
     model.compile(loss=loss, optimizer='adam')
+
+    return model
